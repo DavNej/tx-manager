@@ -1,0 +1,13 @@
+services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    container_name: tx_manager_postgres
+    environment:
+      POSTGRES_DB: main
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"

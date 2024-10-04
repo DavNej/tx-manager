@@ -1,4 +1,4 @@
-# Transactions manager
+# Transaction manager
 
 ## Instructions
 
