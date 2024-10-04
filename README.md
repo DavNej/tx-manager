@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Transactions manager
 
-## Getting Started
+## Instructions
 
-First, run the development server:
+Develop a transaction management module that simulate transaction process
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Responsibilities
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+* Manage payments
+* Trigger transactions
+* Validate transactions
+* Schedule transactions
+* Errors handling
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Objectives
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. Backend (Nest.js or Node.js / PostgreSQL) => REST API
 
-## Learn More
+* Creation of transactions (`amount` from `sender` to `receiver`)
+* Schedule future transactions.
+* Transaction status management (`pending`,   `scheduled`,   `completed`,   `failed`)
+* Implementation (or at least design on paper) of a error handling mechanism (from code or API) (see 3.)
+* Data persistence with PostgreSQL
 
-To learn more about Next.js, take a look at the following resources:
+NB: A transaction is actually carried out by calling an external API (typically that of a payment service provider. A payment service provider who “hosts” users' wallets). You can therefore call an imaginary function coded beforehand and requesting this API.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 2. Frontend (Next.js)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* Create manual and scheduled transactions
+* View transaction history and status
+* Manage transaction errors and retry transactions manually
 
-## Deploy on Vercel
+### 3. Error management and resilience
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+* Implement error management
+* Manage scenarios where a transaction fails
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 4. Autonomy and proactivity
+
+* Make choices in terms of architecture, code organization and good development practices.
+* Suggest improvements or additional features related to transaction resilience or user experience will be a plus.
+
+## Technical details
+
+Tests (recommended):
+* Write at least part of the tests that would validate the main features. In addition, don't hesitate to think about how to test the third-party transaction API (to test both its integration with the code and the API itself. Identify any regressions).
+
+Bonus:
+* Add a notification system to inform the user in real time of the status of his or her transactions (e.g. WebSockets).
+* Design a scalable architecture for the transactional service, which you will present orally.
+
+## Evaluation criteria
+
+* Code quality: Cleanliness, organization and readability of the code.
+* Error handling: Robustness of the system in the event of breakdowns or transaction failures.
+* Autonomy and proactivity: Ability to make technical choices, anticipate problems and propose solutions.
+* User experience: Fluidity and simplicity of the user interface.
+* Testing: Presence and quality of tests.
+
+## Deliverables
+
+* Project source code (via GitHub or other repository).
+* A (very) brief documentation of how the system works, explaining technical choices.
+* Optional: a short report on any areas of improvement you've identified for transaction management (linked to point 3 of the “Bonus” section)
