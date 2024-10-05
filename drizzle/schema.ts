@@ -7,6 +7,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
+import { z } from 'zod'
 
 // Define transaction statuses
 export const transactionStatusEnum = pgEnum('transaction_status', [
@@ -33,3 +34,6 @@ export const transactionsTable = pgTable('transactions', {
 // Transaction validation schema
 export const insertTransactionSchema = createInsertSchema(transactionsTable)
 export const selectTransactionSchema = createSelectSchema(transactionsTable)
+
+export type CreateTransaction = z.infer<typeof insertTransactionSchema>
+export type SelectTransaction = z.infer<typeof selectTransactionSchema>
