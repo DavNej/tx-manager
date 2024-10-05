@@ -1,4 +1,4 @@
-import { desc } from 'drizzle-orm'
+import { eq, desc } from 'drizzle-orm'
 import { db } from './db'
 import {
   type CreateTransaction,
@@ -26,3 +26,37 @@ export async function getTransactions(): Promise<SelectTransaction[]> {
     .orderBy(desc(transactionsTable.createdAt))
 }
 
+/**
+ * Get a transaction by its ID
+ * @returns Promise that resolves to a single transaction
+ */
+export async function getTransactionById({
+  id,
+}: {
+  id: string
+}): Promise<SelectTransaction[]> {
+  return db
+    .select()
+    .from(transactionsTable)
+    .where(eq(transactionsTable.id, id))
+    .limit(1)
+}
+
+/**
+ * Update a transaction by its ID
+ * @param id Transaction ID
+ * @param transactionData Transaction data
+ * @returns Promise that resolves to the updated transaction
+ */
+export async function updateTransactionById({
+  id,
+  updatedData,
+}: {
+  id: string
+  updatedData: Partial<SelectTransaction>
+}) {
+  return db
+    .update(transactionsTable)
+    .set(updatedData)
+    .where(eq(transactionsTable.id, id))
+}
