@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getTransactionById, updateTransactionById } from '@/drizzle/query'
-import { getErrorReason } from '@/lib/utils'
 import logger from '@/lib/logger'
+import { getErrorReason } from '@/lib/utils'
 
 export async function PUT(
   request: NextRequest,

@@ -4,5 +4,18 @@
   "useTabs": false,
   "trailingComma": "es5",
   "singleQuote": true,
-  "semi": false
+  "semi": false,
+  "plugins": ["@trivago/prettier-plugin-sort-imports"],
+  "importOrder": [
+    "^next(.*)$",
+    "^react$",
+    "<THIRD_PARTY_MODULES>",
+    "^@/lib(.*)$",
+    "^@/ui(.*)$",
+    "^@/components(.*)$",
+    "^[./]",
+    "^@/test(.*)$"
+  ],
+  "importOrderSeparation": false,
+  "importOrderSortSpecifiers": true
 }
