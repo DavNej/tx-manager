@@ -1,3 +1,15 @@
+import { randomBytes } from 'crypto'
+
+/**
+ * Generate a random EVM address
+ * @returns Random EVM address
+ */
+export function generateRandomEvmAddress() {
+  const randomValue = randomBytes(20)
+  const address = randomValue.toString('hex')
+  return `0x${address}`
+}
+
 /**
  * Get the cause for an unknown error
  * @param error Error object
