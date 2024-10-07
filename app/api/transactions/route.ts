@@ -1,29 +1,56 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createTransaction, getTransactions } from '@/drizzle/query'
+import {
+  createTransaction,
+  getTransactions,
+  updateTransactionById,
+} from '@/drizzle/query'
 import { insertTransactionSchema } from '@/drizzle/schema'
 import logger from '@/lib/logger'
-import { getErrorReason } from '@/lib/utils'
+import { simulateExternalApiCall } from '@/lib/payment-api'
+import { getErrorCause } from '@/lib/utils'
+
+const bodySchema = insertTransactionSchema.pick({
+  amount: true,
+  senderWallet: true,
+  receiverWallet: true,
+  scheduledFor: true,
+})
 
 export async function POST(request: NextRequest) {
   const body = await request.json()
 
   try {
-    const result = insertTransactionSchema.safeParse(body)
+    const result = bodySchema.safeParse(body)
 
     if (!result.success) {
       const message = 'Wrong transaction data format'
-      const reason = result.error.issues
-      logger.error({ message, error: reason })
-      return NextResponse.json({ message, reason }, { status: 400 })
+      const cause = result.error.issues
+      logger.error({ message, error: cause })
+      return NextResponse.json({ message, cause }, { status: 400 })
     }
 
-    const insertedTransaction = await createTransaction(result.data).returning()
-    return NextResponse.json(insertedTransaction, { status: 201 })
+    // Insert the transaction with 'pending' status
+    const [insertedTransaction] = await createTransaction({
+      ...result.data,
+      status: 'pending',
+    }).returning()
+
+    // Attempt the external API call
+    const isTransactionSuccess = await simulateExternalApiCall()
+    const updatedStatus = isTransactionSuccess ? 'completed' : 'failed'
+
+    const [updatedTransaction] = await updateTransactionById({
+      id: insertedTransaction.id,
+      updatedData: { status: updatedStatus },
+    })
+
+    // Return the updated transaction
+    return NextResponse.json({ updatedTransaction }, { status: 200 })
   } catch (error) {
     const message = 'Error inserting transaction'
     logger.error({ message, error })
     return NextResponse.json(
-      { message, reason: getErrorReason(error) },
+      { message, cause: getErrorCause(error) },
       { status: 500 }
     )
   }
@@ -37,7 +64,7 @@ export async function GET() {
     const message = 'Error fetching transactions'
     logger.error({ message, error })
     return NextResponse.json(
-      { message, reason: getErrorReason(error) },
+      { message, cause: getErrorCause(error) },
       { status: 500 }
     )
   }

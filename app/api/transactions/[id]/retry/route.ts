@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getTransactionById, updateTransactionById } from '@/drizzle/query'
 import logger from '@/lib/logger'
-import { getErrorReason } from '@/lib/utils'
+import { simulateExternalApiCall } from '@/lib/payment-api'
+import { getErrorCause } from '@/lib/utils'
 
 export async function PUT(
   request: NextRequest,
@@ -26,32 +27,24 @@ export async function PUT(
       )
     }
 
-    const isTransactionSuccess = await simulateExternalApiCall() // Simulate retry logic (mocking the external API call here)
+    const isTransactionSuccess = await simulateExternalApiCall()
     const newStatus = isTransactionSuccess ? 'completed' : 'failed'
 
-    const updatedTransaction = await updateTransactionById({
+    const [updatedTransaction] = await updateTransactionById({
       id,
       updatedData: { status: newStatus },
-    })
+    }).returning()
 
     return NextResponse.json(
-      { message: 'Transaction updated', transaction: updatedTransaction[0] },
+      { message: 'Transaction completed', transaction: updatedTransaction },
       { status: 200 }
     )
   } catch (error) {
     const message = 'Error retrying transaction'
     logger.error({ message, error })
     return NextResponse.json(
-      { message, reason: getErrorReason(error) },
+      { message, cause: getErrorCause(error) },
       { status: 500 }
     )
   }
-}
-
-async function simulateExternalApiCall() {
-  return new Promise<boolean>((resolve) => {
-    setTimeout(() => {
-      resolve(Math.random() > 0.3) // 30% failure rate
-    }, 1000)
-  })
 }

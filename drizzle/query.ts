@@ -19,7 +19,7 @@ export function createTransaction(transactionData: CreateTransaction) {
  * Get all transactions in descending order of creation
  * @returns Promise that resolves to an array of transactions
  */
-export async function getTransactions(): Promise<SelectTransaction[]> {
+export function getTransactions(): Promise<SelectTransaction[]> {
   return db
     .select()
     .from(transactionsTable)
@@ -30,7 +30,7 @@ export async function getTransactions(): Promise<SelectTransaction[]> {
  * Get a transaction by its ID
  * @returns Promise that resolves to a single transaction
  */
-export async function getTransactionById({
+export function getTransactionById({
   id,
 }: {
   id: string
@@ -48,7 +48,7 @@ export async function getTransactionById({
  * @param transactionData Transaction data
  * @returns Promise that resolves to the updated transaction
  */
-export async function updateTransactionById({
+export function updateTransactionById({
   id,
   updatedData,
 }: {
