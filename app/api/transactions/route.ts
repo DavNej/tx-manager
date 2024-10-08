@@ -42,10 +42,10 @@ export async function POST(request: NextRequest) {
     const [updatedTransaction] = await updateTransactionById({
       id: insertedTransaction.id,
       updatedData: { status: updatedStatus },
-    })
+    }).returning()
 
     // Return the updated transaction
-    return NextResponse.json({ updatedTransaction }, { status: 200 })
+    return NextResponse.json(updatedTransaction, { status: 200 })
   } catch (error) {
     const message = 'Error inserting transaction'
     logger.error({ message, error })

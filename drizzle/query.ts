@@ -57,6 +57,6 @@ export function updateTransactionById({
 }) {
   return db
     .update(transactionsTable)
-    .set(updatedData)
+    .set({ ...updatedData, updatedAt: new Date() })
     .where(eq(transactionsTable.id, id))
 }
