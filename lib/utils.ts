@@ -1,4 +1,13 @@
+import { type ClassValue, clsx } from 'clsx'
 import { randomBytes } from 'crypto'
+import { twMerge } from 'tailwind-merge'
+
+/**
+ * Shadcn classes utility
+ */
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 
 /**
  * Generate a random EVM address
