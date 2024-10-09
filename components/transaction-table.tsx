@@ -30,6 +30,22 @@ function handleRetry(id: string) {
   console.log(`Retrying transaction ${id}`)
 }
 
+export function TransactionTableHeader() {
+  return (
+    <TableHeader>
+      <TableRow>
+        <TableHead>Date</TableHead>
+        <TableHead>Sender</TableHead>
+        <TableHead>Receiver</TableHead>
+        <TableHead>Amount</TableHead>
+        <TableHead>Scheduled Date</TableHead>
+        <TableHead>Status</TableHead>
+        <TableHead className="text-right">Retry</TableHead>
+      </TableRow>
+    </TableHeader>
+  )
+}
+
 export default function TransactionTable({
   data,
 }: {
@@ -37,17 +53,7 @@ export default function TransactionTable({
 }) {
   return (
     <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Amount</TableHead>
-          <TableHead>Sender</TableHead>
-          <TableHead>Receiver</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Scheduled For</TableHead>
-          <TableHead>Created At</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
-        </TableRow>
-      </TableHeader>
+      <TransactionTableHeader />
       <TableBody>
         {data.length === 0 ? (
           <TableRow>

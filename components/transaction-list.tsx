@@ -6,6 +6,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { getTransactionsOptions } from '@/lib/get-transactions'
 import { Card, CardContent } from '@/components/ui/card'
 import TransactionTable from './transaction-table'
+import { TransactionTableLoading } from './transaction-table-loading'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,7 +35,7 @@ export default function TransactionList() {
     <Card className="drop-shadow-md">
       <CardContent className="pt-4">
         {isFetching ? (
-          <p>Loading...</p>
+          <TransactionTableLoading />
         ) : (
           <TransactionTable data={data || []} />
         )}
