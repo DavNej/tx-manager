@@ -31,21 +31,25 @@ export async function POST(request: NextRequest) {
 
     // Insert the transaction with 'pending' status
     const [insertedTransaction] = await createTransaction({
-      ...result.data,
       status: 'pending',
+      ...result.data,
     }).returning()
+
+    // return if the transaction is scheduled
+    if (insertedTransaction.scheduledFor)
+      return NextResponse.json(insertedTransaction, { status: 200 })
 
     // Attempt the external API call
     const isTransactionSuccess = await simulateExternalApiCall()
     const updatedStatus = isTransactionSuccess ? 'completed' : 'failed'
-
     const [updatedTransaction] = await updateTransactionById({
       id: insertedTransaction.id,
       updatedData: { status: updatedStatus },
     }).returning()
 
-    // Return the updated transaction
     return NextResponse.json(updatedTransaction, { status: 200 })
+
+    // Return the updated transaction
   } catch (error) {
     const message = 'Error inserting transaction'
     logger.error({ message, error })
