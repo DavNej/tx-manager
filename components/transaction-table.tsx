@@ -2,14 +2,8 @@
 
 import React from 'react'
 import type { SelectTransaction } from '@/drizzle/schema'
-import { Eye, MoreHorizontal, RefreshCw } from 'lucide-react'
+import { RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import {
   Table,
   TableBody,
@@ -19,16 +13,21 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-function formatDate(date: Date | null) {
-  return date ? date.toLocaleString() : 'N/A'
+function formatDate(date: Date | null): string {
+  if (!date) return 'N/A'
+
+  return Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: false,
+  }).format(new Date(date))
 }
 
 function handleRetry(id: string) {
   console.log(`Retrying transaction ${id}`)
-}
-
-function handleView(id: string) {
-  console.log(`Viewing transaction ${id}`)
 }
 
 export default function TransactionTable({
@@ -36,8 +35,6 @@ export default function TransactionTable({
 }: {
   data: SelectTransaction[]
 }) {
-  if (data.length === 0) return <p>No transactions</p>
-
   return (
     <Table>
       <TableHeader>
@@ -52,36 +49,34 @@ export default function TransactionTable({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data.map((tx) => (
-          <TableRow key={tx.id}>
-            <TableCell>{tx.amount}</TableCell>
-            <TableCell>{tx.senderWallet}</TableCell>
-            <TableCell>{tx.receiverWallet}</TableCell>
-            <TableCell>{tx.status}</TableCell>
-            <TableCell>{formatDate(tx.scheduledFor)}</TableCell>
-            <TableCell>{formatDate(tx.createdAt)}</TableCell>
-            <TableCell className="text-right">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-8 p-0">
-                    <span className="sr-only">Open menu</span>
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleRetry(tx.id)}>
-                    <RefreshCw className="mr-2 h-4 w-4" />
-                    <span>Retry</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleView(tx.id)}>
-                    <Eye className="mr-2 h-4 w-4" />
-                    <span>View</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </TableCell>
+        {data.length === 0 ? (
+          <TableRow>
+            <TableCell colSpan={7}>No transactions</TableCell>
           </TableRow>
-        ))}
+        ) : (
+          data.map((tx) => (
+            <TableRow key={tx.id}>
+              <TableCell>{tx.amount}</TableCell>
+              <TableCell>{tx.senderWallet}</TableCell>
+              <TableCell>{tx.receiverWallet}</TableCell>
+              <TableCell>{tx.status}</TableCell>
+              <TableCell>{formatDate(tx.scheduledFor)}</TableCell>
+              <TableCell>{formatDate(tx.createdAt)}</TableCell>
+              <TableCell className="text-right">
+                {tx.status === 'failed' && (
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => handleRetry(tx.id)}
+                    title="Retry"
+                  >
+                    <RefreshCw className="size-4" />
+                  </Button>
+                )}
+              </TableCell>
+            </TableRow>
+          ))
+        )}
       </TableBody>
     </Table>
   )
