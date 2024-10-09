@@ -3,6 +3,7 @@
 import React from 'react'
 import type { SelectTransaction } from '@/drizzle/schema'
 import { RefreshCw } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -46,6 +47,17 @@ export function TransactionTableHeader() {
   )
 }
 
+function getBadgeVariant(status: string) {
+  switch (status) {
+    case 'failed':
+      return 'destructive'
+    case 'completed':
+      return 'success'
+    default:
+      return 'outline'
+  }
+}
+
 export default function TransactionTable({
   data,
 }: {
@@ -62,12 +74,14 @@ export default function TransactionTable({
         ) : (
           data.map((tx) => (
             <TableRow key={tx.id}>
-              <TableCell>{tx.amount}</TableCell>
+              <TableCell>{formatDate(tx.createdAt)}</TableCell>
               <TableCell>{tx.senderWallet}</TableCell>
               <TableCell>{tx.receiverWallet}</TableCell>
-              <TableCell>{tx.status}</TableCell>
+              <TableCell>{tx.amount} €</TableCell>
               <TableCell>{formatDate(tx.scheduledFor)}</TableCell>
-              <TableCell>{formatDate(tx.createdAt)}</TableCell>
+              <TableCell>
+                <Badge className='capitalize' variant={getBadgeVariant(tx.status)}>{tx.status}</Badge>
+              </TableCell>
               <TableCell className="text-right">
                 {tx.status === 'failed' && (
                   <Button
