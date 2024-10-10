@@ -8,7 +8,7 @@ function error({ message, error }: { message: string; error: unknown }) {
   console.log('💥💥💥 |', message)
   console.error('---')
   console.error(error)
-  console.error('💥💥💥')
+  console.error('---')
 }
 
 const logger = {

@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import {
   createTransaction,
-  getTransactions,
+  findTransactions,
   updateTransactionById,
 } from '@/drizzle/query'
 import { insertTransactionSchema } from '@/drizzle/schema'
 import logger from '@/lib/logger'
 import { simulateExternalApiCall } from '@/lib/payment-api'
+import { scheduleTransaction } from '@/lib/transaction-queue'
 import { getErrorCause } from '@/lib/utils'
 
 const bodySchema = insertTransactionSchema.pick({
@@ -20,6 +21,10 @@ export async function POST(request: NextRequest) {
   const body = await request.json()
 
   try {
+    if (body.scheduledFor) {
+      body.scheduledFor = new Date(body.scheduledFor)
+    }
+
     const result = bodySchema.safeParse(body)
 
     if (!result.success) {
@@ -29,15 +34,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message, cause }, { status: 400 })
     }
 
-    // Insert the transaction with 'pending' status
+    const { scheduledFor } = result.data
+
+    // Insert the transaction
     const [insertedTransaction] = await createTransaction({
-      status: 'pending',
       ...result.data,
+      status: scheduledFor ? 'scheduled' : 'pending',
     }).returning()
 
-    // return if the transaction is scheduled
-    if (insertedTransaction.scheduledFor)
+    // Schedule the transaction if a scheduledFor time is provided
+    if (scheduledFor) {
+      await scheduleTransaction({
+        transactionId: insertedTransaction.id,
+        scheduledFor: new Date(scheduledFor),
+      })
       return NextResponse.json(insertedTransaction, { status: 200 })
+    }
 
     // Attempt the external API call
     const isTransactionSuccess = await simulateExternalApiCall()
@@ -62,7 +74,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    const transactions = await getTransactions()
+    const transactions = await findTransactions()
     return NextResponse.json(transactions)
   } catch (error) {
     const message = 'Error fetching transactions'

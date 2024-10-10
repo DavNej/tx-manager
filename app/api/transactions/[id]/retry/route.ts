@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getTransactionById, updateTransactionById } from '@/drizzle/query'
+import { findTransactionById, updateTransactionById } from '@/drizzle/query'
 import logger from '@/lib/logger'
 import { simulateExternalApiCall } from '@/lib/payment-api'
 import { getErrorCause } from '@/lib/utils'
@@ -11,7 +11,7 @@ export async function PUT(
   const { id } = params
 
   try {
-    const [transaction] = await getTransactionById({ id })
+    const [transaction] = await findTransactionById({ id })
 
     if (!transaction) {
       return NextResponse.json(

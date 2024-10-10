@@ -16,10 +16,10 @@ export function createTransaction(transactionData: CreateTransaction) {
 }
 
 /**
- * Get all transactions in descending order of creation
+ * Find all transactions in descending order of creation
  * @returns Promise that resolves to an array of transactions
  */
-export function getTransactions(): Promise<SelectTransaction[]> {
+export function findTransactions(): Promise<SelectTransaction[]> {
   return db
     .select()
     .from(transactionsTable)
@@ -27,10 +27,10 @@ export function getTransactions(): Promise<SelectTransaction[]> {
 }
 
 /**
- * Get a transaction by its ID
+ * Find a transaction by its ID
  * @returns Promise that resolves to a single transaction
  */
-export function getTransactionById({
+export function findTransactionById({
   id,
 }: {
   id: string
