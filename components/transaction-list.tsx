@@ -4,7 +4,6 @@ import React from 'react'
 import { toast } from '@/hooks/use-toast'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getTransactionsOptions } from '@/lib/get-transactions'
-import { Card, CardContent } from '@/components/ui/card'
 import TransactionTable from './transaction-table'
 import { TransactionTableLoading } from './transaction-table-loading'
 
@@ -31,15 +30,7 @@ export default function TransactionList() {
     }
   }, [error, isError])
 
-  return (
-    <Card className="drop-shadow-md">
-      <CardContent className="pt-4">
-        {isFetching ? (
-          <TransactionTableLoading />
-        ) : (
-          <TransactionTable data={data || []} />
-        )}
-      </CardContent>
-    </Card>
-  )
+  if (isFetching) return <TransactionTableLoading />
+
+  return <TransactionTable data={data || []} />
 }

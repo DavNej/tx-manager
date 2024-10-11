@@ -5,6 +5,7 @@ import { getQueryClient } from '@/lib/get-query-client'
 import { getTransactionsOptions } from '@/lib/get-transactions'
 import CreateTransactionButton from '@/components/create-transaction-button'
 import TransactionList from '@/components/transaction-list'
+import { Card, CardContent } from '@/components/ui/card'
 import Typography from '@/components/ui/typography'
 
 export default async function Home() {
@@ -33,7 +34,11 @@ export default async function Home() {
           <CreateTransactionButton />
         </div>
 
-        <TransactionList />
+        <Card className="drop-shadow-md">
+          <CardContent className="pt-4">
+            <TransactionList />
+          </CardContent>
+        </Card>
       </main>
     </HydrationBoundary>
   )

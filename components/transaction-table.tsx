@@ -80,7 +80,12 @@ export default function TransactionTable({
               <TableCell>{tx.amount} €</TableCell>
               <TableCell>{formatDate(tx.scheduledFor)}</TableCell>
               <TableCell>
-                <Badge className='capitalize' variant={getBadgeVariant(tx.status)}>{tx.status}</Badge>
+                <Badge
+                  className="capitalize"
+                  variant={getBadgeVariant(tx.status)}
+                >
+                  {tx.status}
+                </Badge>
               </TableCell>
               <TableCell className="text-right">
                 {tx.status === 'failed' && (
