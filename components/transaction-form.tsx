@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
-import { Calendar as CalendarIcon, Sparkles } from 'lucide-react'
+import { Calendar as CalendarIcon, Sparkles, Send } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { cn, generateRandomEvmAddress } from '@/lib/utils'
@@ -245,7 +245,8 @@ export default function TransactionForm() {
         )}
 
         <Button className="ml-auto" type="submit">
-          Submit
+          Send
+          <Send className="ml-2 size-4" />
         </Button>
       </form>
     </Form>

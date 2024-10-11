@@ -1,31 +1,18 @@
-import Image from 'next/image'
 import * as React from 'react'
+import Header from '@/components/header'
 import TransactionForm from '@/components/transaction-form'
-import { Card, CardContent } from '@/components/ui/card'
-import Typography from '@/components/ui/typography'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default async function NewTransactionPage() {
   return (
     <main className="p-8 flex flex-col gap-8">
-      <div className="flex justify-between items-center">
-        <div className="">
-          <div className="flex items-center">
-            <Image
-              className="rouded-full drop-shadow-md mr-4"
-              src="/logo.svg"
-              alt="Tx Manager logo"
-              width={40}
-              height={40}
-            />
-            <Typography.H2 className="border-none p-0">
-              New transaction
-            </Typography.H2>
-          </div>
-        </div>
-      </div>
+      <Header />
 
-      <Card className="drop-shadow-md w-1/2">
-        <CardContent className="pt-4">
+      <Card className="drop-shadow-md w-1/2 mx-auto">
+        <CardHeader>
+          <CardTitle>New transaction</CardTitle>
+        </CardHeader>
+        <CardContent>
           <TransactionForm />
         </CardContent>
       </Card>
