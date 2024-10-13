@@ -1,7 +1,7 @@
 import { desc, eq } from 'drizzle-orm'
 import { db } from './db'
 import {
-  type CreateTransaction,
+  type InsertTransaction,
   type SelectTransaction,
   transactionsTable,
 } from './schema'
@@ -11,7 +11,7 @@ import {
  * @param transactionData Transaction data
  * @returns Promise that resolves to the inserted transaction
  */
-export function createTransaction(transactionData: CreateTransaction) {
+export function insertTransaction(transactionData: InsertTransaction) {
   return db.insert(transactionsTable).values(transactionData)
 }
 

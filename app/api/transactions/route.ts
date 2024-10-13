@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import {
-  createTransaction,
+  insertTransaction,
   findTransactions,
   updateTransactionById,
 } from '@/drizzle/query'
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     const { scheduledFor } = result.data
 
     // Insert the transaction
-    const [insertedTransaction] = await createTransaction({
+    const [insertedTransaction] = await insertTransaction({
       ...result.data,
       status: scheduledFor ? 'scheduled' : 'pending',
     }).returning()

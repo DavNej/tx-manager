@@ -35,5 +35,5 @@ export const transactionsTable = pgTable('transactions', {
 export const insertTransactionSchema = createInsertSchema(transactionsTable)
 export const selectTransactionSchema = createSelectSchema(transactionsTable)
 
-export type CreateTransaction = z.infer<typeof insertTransactionSchema>
+export type InsertTransaction = z.infer<typeof insertTransactionSchema>
 export type SelectTransaction = z.infer<typeof selectTransactionSchema>

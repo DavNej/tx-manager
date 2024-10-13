@@ -1,7 +1,7 @@
 import { generateRandomEvmAddress } from '@/lib/utils'
 import { db } from './db'
 import {
-  type CreateTransaction,
+  type InsertTransaction,
   transactionStatusEnum,
   transactionsTable,
 } from './schema'
@@ -21,7 +21,7 @@ function getRandomStatus() {
  * Generate a random transaction
  * @returns Random transaction
  */
-function generateRandomTransaction(): CreateTransaction {
+function generateRandomTransaction(): InsertTransaction {
   return {
     amount: (Math.random() * 1000).toFixed(2),
     senderWallet: generateRandomEvmAddress(),
