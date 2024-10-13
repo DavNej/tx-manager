@@ -7,8 +7,6 @@ import { getTransactionsOptions } from '@/lib/get-transactions'
 import TransactionTable from './transaction-table'
 import { TransactionTableLoading } from './transaction-table-loading'
 
-export const dynamic = 'force-dynamic'
-
 export default function TransactionList() {
   const { data, isFetching, error, isError } = useSuspenseQuery(
     getTransactionsOptions()

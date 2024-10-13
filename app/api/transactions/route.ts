@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import {
-  insertTransaction,
   findTransactions,
+  insertTransaction,
   updateTransactionById,
 } from '@/drizzle/query'
 import { insertTransactionSchema } from '@/drizzle/schema'
@@ -9,6 +9,8 @@ import logger from '@/lib/logger'
 import { simulateExternalApiCall } from '@/lib/payment-api'
 import { scheduleTransaction } from '@/lib/transaction-queue'
 import { getErrorCause } from '@/lib/utils'
+
+export const dynamic = 'force-dynamic'
 
 const bodySchema = insertTransactionSchema.pick({
   amount: true,
