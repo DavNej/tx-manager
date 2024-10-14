@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { findTransactionById, updateTransactionById } from '@/drizzle/query'
-import logger from '@/lib/logger'
-import { simulateExternalApiCall } from '@/lib/payment-api'
-import { getErrorCause } from '@/lib/utils'
+import { findTransactionById } from '@/drizzle/query'
+import { processTransaction } from '@/server/actions'
+import { catchUnexpectedError } from '@/server/error-service'
 
 export async function PUT(
   request: NextRequest,
@@ -11,7 +10,7 @@ export async function PUT(
   const { id } = params
 
   try {
-    const [transaction] = await findTransactionById({ id })
+    const transaction = await findTransactionById(id)
 
     if (!transaction) {
       return NextResponse.json(
@@ -27,23 +26,12 @@ export async function PUT(
       )
     }
 
-    const isTransactionSuccess = await simulateExternalApiCall()
-    const newStatus = isTransactionSuccess ? 'completed' : 'failed'
-
-    const [updatedTransaction] = await updateTransactionById({
-      id,
-      updatedData: { status: newStatus },
-    }).returning()
-
-    return NextResponse.json(
-      { message: 'Transaction completed', transaction: updatedTransaction },
-      { status: 200 }
-    )
+    const processedTransaction = await processTransaction(transaction)
+    return NextResponse.json(processedTransaction, { status: 200 })
   } catch (error) {
-    const message = 'Error retrying transaction'
-    logger.error({ message, error })
+    catchUnexpectedError(error)
     return NextResponse.json(
-      { message, cause: getErrorCause(error) },
+      { message: 'Error while retrying to process the transaction' },
       { status: 500 }
     )
   }

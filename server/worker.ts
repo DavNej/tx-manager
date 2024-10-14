@@ -5,8 +5,8 @@ import dotenv from 'dotenv'
 import { and, eq, lte, notInArray } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
-import logger from './logger'
-import { simulateExternalApiCall } from './payment-api'
+import logger from '../lib/logger'
+import { processTransaction } from './actions'
 import {
   connection,
   scheduleTransaction,
@@ -38,15 +38,8 @@ const worker = new Worker(
       })
 
       if (transaction) {
-        const isTransactionSuccess = await simulateExternalApiCall()
-        const updatedStatus = isTransactionSuccess ? 'completed' : 'failed'
-
-        await db
-          .update(transactionsTable)
-          .set({ status: updatedStatus, updatedAt: new Date() })
-          .where(eq(transactionsTable.id, transactionId))
-
-        return updatedStatus
+        const processedTransaction = await processTransaction(transaction)
+        return processedTransaction.status
       }
     } catch (error) {
       const message = 'Error processing transaction'

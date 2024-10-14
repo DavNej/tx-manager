@@ -34,6 +34,13 @@ export const transactionsTable = pgTable('transactions', {
 // Transaction validation schema
 export const insertTransactionSchema = createInsertSchema(transactionsTable)
 export const selectTransactionSchema = createSelectSchema(transactionsTable)
+export const createTransactionSchema = insertTransactionSchema.pick({
+  amount: true,
+  senderWallet: true,
+  receiverWallet: true,
+  scheduledFor: true,
+})
 
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>
 export type SelectTransaction = z.infer<typeof selectTransactionSchema>
+export type CreateTransaction = z.infer<typeof createTransactionSchema>

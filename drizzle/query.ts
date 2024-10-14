@@ -30,16 +30,10 @@ export function findTransactions(): Promise<SelectTransaction[]> {
  * Find a transaction by its ID
  * @returns Promise that resolves to a single transaction
  */
-export function findTransactionById({
-  id,
-}: {
-  id: string
-}): Promise<SelectTransaction[]> {
-  return db
-    .select()
-    .from(transactionsTable)
-    .where(eq(transactionsTable.id, id))
-    .limit(1)
+export function findTransactionById(id: string) {
+  return db.query.transactionsTable.findFirst({
+    where: eq(transactionsTable.id, id),
+  })
 }
 
 /**

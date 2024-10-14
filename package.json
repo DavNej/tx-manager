@@ -13,7 +13,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:drop": "drizzle-kit drop",
     "db:studio": "drizzle-kit studio",
-    "worker:run": "tsx --watch lib/worker.ts"
+    "worker:run": "tsx --watch server/worker.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

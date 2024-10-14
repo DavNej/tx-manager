@@ -1,33 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
-import {
-  findTransactions,
-  insertTransaction,
-  updateTransactionById,
-} from '@/drizzle/query'
-import { insertTransactionSchema } from '@/drizzle/schema'
+import { findTransactions } from '@/drizzle/query'
+import { createTransactionSchema } from '@/drizzle/schema'
+import { createTransaction } from '@/server/actions'
 import logger from '@/lib/logger'
-import { simulateExternalApiCall } from '@/lib/payment-api'
-import { scheduleTransaction } from '@/lib/transaction-queue'
 import { getErrorCause } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
-
-const bodySchema = insertTransactionSchema.pick({
-  amount: true,
-  senderWallet: true,
-  receiverWallet: true,
-  scheduledFor: true,
-})
 
 export async function POST(request: NextRequest) {
   const body = await request.json()
 
   try {
-    if (body.scheduledFor) {
+    if (body.scheduledFor instanceof Date) {
       body.scheduledFor = new Date(body.scheduledFor)
     }
 
-    const result = bodySchema.safeParse(body)
+    const result = createTransactionSchema.safeParse(body)
 
     if (!result.success) {
       const message = 'Wrong transaction data format'
@@ -36,34 +24,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message, cause }, { status: 400 })
     }
 
-    const { scheduledFor } = result.data
+    const transaction = await createTransaction(body)
 
-    // Insert the transaction
-    const [insertedTransaction] = await insertTransaction({
-      ...result.data,
-      status: scheduledFor ? 'scheduled' : 'pending',
-    }).returning()
-
-    // Schedule the transaction if a scheduledFor time is provided
-    if (scheduledFor) {
-      await scheduleTransaction({
-        transactionId: insertedTransaction.id,
-        scheduledFor: new Date(scheduledFor),
-      })
-      return NextResponse.json(insertedTransaction, { status: 200 })
-    }
-
-    // Attempt the external API call
-    const isTransactionSuccess = await simulateExternalApiCall()
-    const updatedStatus = isTransactionSuccess ? 'completed' : 'failed'
-    const [updatedTransaction] = await updateTransactionById({
-      id: insertedTransaction.id,
-      updatedData: { status: updatedStatus },
-    }).returning()
-
-    return NextResponse.json(updatedTransaction, { status: 200 })
-
-    // Return the updated transaction
+    return NextResponse.json(transaction, { status: 200 })
   } catch (error) {
     const message = 'Error inserting transaction'
     logger.error({ message, error })
