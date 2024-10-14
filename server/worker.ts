@@ -5,8 +5,8 @@ import dotenv from 'dotenv'
 import { and, eq, lte, notInArray } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
-import logger from '../lib/logger'
 import { processTransaction } from './actions'
+import { handleWorkerError } from './error-service'
 import {
   connection,
   scheduleTransaction,
@@ -42,12 +42,7 @@ const worker = new Worker(
         return processedTransaction.status
       }
     } catch (error) {
-      const message = 'Error processing transaction'
-      logger.error({
-        message,
-        error,
-      })
-      throw new Error(message, { cause: error })
+      handleWorkerError(error)
     }
   },
   { connection }

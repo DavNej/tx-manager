@@ -2,8 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { findTransactions } from '@/drizzle/query'
 import { createTransactionSchema } from '@/drizzle/schema'
 import { createTransaction } from '@/server/actions'
-import logger from '@/lib/logger'
-import { getErrorCause } from '@/lib/utils'
+import {
+  handleUnexpectedError,
+  isZodError,
+  logError,
+} from '@/server/error-service'
+import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,27 +15,26 @@ export async function POST(request: NextRequest) {
   const body = await request.json()
 
   try {
-    if (body.scheduledFor instanceof Date) {
-      body.scheduledFor = new Date(body.scheduledFor)
+    if (body.scheduledFor) {
+      const scheduledFor = z.date().parse(body.scheduledFor)
+      body.scheduledFor = scheduledFor
     }
 
-    const result = createTransactionSchema.safeParse(body)
-
-    if (!result.success) {
-      const message = 'Wrong transaction data format'
-      const cause = result.error.issues
-      logger.error({ message, error: cause })
-      return NextResponse.json({ message, cause }, { status: 400 })
-    }
-
-    const transaction = await createTransaction(body)
+    const transactionArgs = createTransactionSchema.parse(body)
+    const transaction = await createTransaction(transactionArgs)
 
     return NextResponse.json(transaction, { status: 200 })
   } catch (error) {
-    const message = 'Error inserting transaction'
-    logger.error({ message, error })
+    if (isZodError(error)) {
+      logError(error)
+      return NextResponse.json(
+        { message: 'Wrong transaction data format', details: error.format() },
+        { status: 400 }
+      )
+    }
+    handleUnexpectedError(error)
     return NextResponse.json(
-      { message, cause: getErrorCause(error) },
+      { message: 'Error inserting transaction' },
       { status: 500 }
     )
   }
@@ -40,12 +43,11 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   try {
     const transactions = await findTransactions()
-    return NextResponse.json(transactions)
+    return NextResponse.json(transactions, { status: 200 })
   } catch (error) {
-    const message = 'Error fetching transactions'
-    logger.error({ message, error })
+    handleUnexpectedError(error)
     return NextResponse.json(
-      { message, cause: getErrorCause(error) },
+      { message: 'Error fetching transactions' },
       { status: 500 }
     )
   }

@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { toast } from '@/hooks/use-toast'
+import { logError } from '@/server/error-service'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { getTransactionsOptions } from '@/lib/get-transactions'
 import TransactionTable from './transaction-table'
@@ -14,15 +15,11 @@ export default function TransactionList() {
 
   React.useEffect(() => {
     if (isError) {
-      console.log('error', error)
-
-      const description = error?.cause
-        ? String(error.cause)
-        : 'Something went wrong'
+      logError(error)
 
       toast({
-        title: error?.message || 'Oops !',
-        description,
+        title: 'Something went wrong',
+        description: error?.message,
         variant: 'destructive',
       })
     }

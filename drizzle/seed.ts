@@ -1,3 +1,4 @@
+import { handleDatabaseError } from '@/server/error-service'
 import { generateRandomEvmAddress } from '@/lib/utils'
 import { db } from './db'
 import {
@@ -40,5 +41,13 @@ export function seedDatabase(count = 1) {
     { length: count },
     generateRandomTransaction
   )
-  return db.insert(transactionsTable).values(transactionsData)
+  try {
+    return db.insert(transactionsTable).values(transactionsData)
+  } catch (error) {
+    throw handleDatabaseError(
+      error,
+      'Failed to seed database',
+      transactionsData
+    )
+  }
 }

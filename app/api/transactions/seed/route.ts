@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { transactionsTable } from '@/drizzle/schema'
 import { seedDatabase } from '@/drizzle/seed'
-import logger from '@/lib/logger'
-import { getErrorCause } from '@/lib/utils'
+import { handleUnexpectedError } from '@/server/error-service'
 
 export async function POST(request: NextRequest) {
   const body = await request.json()
@@ -13,12 +12,11 @@ export async function POST(request: NextRequest) {
       insertedId: transactionsTable.id,
     })
 
-    return NextResponse.json({ insertedTxIds }, { status: 201 })
+    return NextResponse.json({ insertedTxIds }, { status: 200 })
   } catch (error) {
-    const message = 'Error seeding database'
-    logger.error({ message, error })
+    handleUnexpectedError(error)
     return NextResponse.json(
-      { message, cause: getErrorCause(error) },
+      { message: 'Error seeding database' },
       { status: 500 }
     )
   }

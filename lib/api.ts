@@ -1,9 +1,4 @@
-import logger from './logger'
-
-type ApiError = {
-  message: string
-  cause: unknown
-}
+import { handleApiError, logError } from '@/server/error-service'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL as string
 
@@ -26,15 +21,12 @@ async function GET<T>(url: string): Promise<T> {
   try {
     responseBody = await response.json()
   } catch (error) {
-    const message = `GET ${url} : Failed to parse response JSON`
-    logger.error({ message, error })
-    throw new Error(message)
+    logError(error)
+    throw new Error(`GET ${url} : Failed to parse response JSON`)
   }
 
   if (!response.ok) {
-    const { message, cause } = responseBody as ApiError
-    logger.error({ message, error: cause })
-    throw new Error(message, { cause })
+    throw handleApiError(responseBody)
   }
 
   return responseBody
@@ -52,15 +44,12 @@ async function POST<T, B = unknown>(url: string, body?: B): Promise<T> {
   try {
     responseBody = await response.json()
   } catch (error) {
-    const message = `POST ${url} : Failed to parse response JSON`
-    logger.error({ message, error })
-    throw new Error(message)
+    logError(error)
+    throw new Error(`POST ${url} : Failed to parse response JSON`)
   }
 
   if (!response.ok) {
-    const { message, cause } = responseBody as ApiError
-    logger.error({ message, error: cause })
-    throw new Error(message, { cause })
+    throw handleApiError(responseBody)
   }
 
   return responseBody
@@ -78,15 +67,12 @@ async function PUT<T, B = unknown>(url: string, body?: B): Promise<T> {
   try {
     responseBody = await response.json()
   } catch (error) {
-    const message = `POST ${url} : Failed to parse response JSON`
-    logger.error({ message, error })
-    throw new Error(message)
+    logError(error)
+    throw new Error(`PUT ${url} : Failed to parse response JSON`)
   }
 
   if (!response.ok) {
-    const { message, cause } = responseBody as ApiError
-    logger.error({ message, error: cause })
-    throw new Error(message, { cause })
+    throw handleApiError(responseBody)
   }
 
   return responseBody

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { findTransactionById } from '@/drizzle/query'
 import { processTransaction } from '@/server/actions'
-import { catchUnexpectedError } from '@/server/error-service'
+import { handleUnexpectedError } from '@/server/error-service'
 
 export async function PUT(
   request: NextRequest,
@@ -29,7 +29,7 @@ export async function PUT(
     const processedTransaction = await processTransaction(transaction)
     return NextResponse.json(processedTransaction, { status: 200 })
   } catch (error) {
-    catchUnexpectedError(error)
+    handleUnexpectedError(error)
     return NextResponse.json(
       { message: 'Error while retrying to process the transaction' },
       { status: 500 }

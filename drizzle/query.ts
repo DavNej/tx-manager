@@ -1,3 +1,4 @@
+import { handleDatabaseError } from '@/server/error-service'
 import { desc, eq } from 'drizzle-orm'
 import { db } from './db'
 import {
@@ -12,7 +13,15 @@ import {
  * @returns Promise that resolves to the inserted transaction
  */
 export function insertTransaction(transactionData: InsertTransaction) {
-  return db.insert(transactionsTable).values(transactionData)
+  try {
+    return db.insert(transactionsTable).values(transactionData)
+  } catch (error) {
+    throw handleDatabaseError(
+      error,
+      'Failed to insert transaction',
+      transactionData
+    )
+  }
 }
 
 /**
@@ -20,10 +29,14 @@ export function insertTransaction(transactionData: InsertTransaction) {
  * @returns Promise that resolves to an array of transactions
  */
 export function findTransactions(): Promise<SelectTransaction[]> {
-  return db
-    .select()
-    .from(transactionsTable)
-    .orderBy(desc(transactionsTable.createdAt))
+  try {
+    return db
+      .select()
+      .from(transactionsTable)
+      .orderBy(desc(transactionsTable.createdAt))
+  } catch (error) {
+    throw handleDatabaseError(error, 'Failed to find transactions')
+  }
 }
 
 /**
@@ -31,26 +44,38 @@ export function findTransactions(): Promise<SelectTransaction[]> {
  * @returns Promise that resolves to a single transaction
  */
 export function findTransactionById(id: string) {
-  return db.query.transactionsTable.findFirst({
-    where: eq(transactionsTable.id, id),
-  })
+  try {
+    return db.query.transactionsTable.findFirst({
+      where: eq(transactionsTable.id, id),
+    })
+  } catch (error) {
+    throw handleDatabaseError(
+      error,
+      `Failed to find transaction with ID: ${id}`
+    )
+  }
 }
 
 /**
  * Update a transaction by its ID
  * @param id Transaction ID
- * @param transactionData Transaction data
+ * @param dataToUpdate Set of data to update
  * @returns Promise that resolves to the updated transaction
  */
-export function updateTransactionById({
-  id,
-  updatedData,
-}: {
-  id: string
-  updatedData: Partial<SelectTransaction>
-}) {
-  return db
-    .update(transactionsTable)
-    .set({ ...updatedData, updatedAt: new Date() })
-    .where(eq(transactionsTable.id, id))
+export function updateTransactionById(
+  id: string,
+  dataToUpdate: Partial<SelectTransaction>
+) {
+  try {
+    return db
+      .update(transactionsTable)
+      .set({ ...dataToUpdate, updatedAt: new Date() })
+      .where(eq(transactionsTable.id, id))
+  } catch (error) {
+    throw handleDatabaseError(
+      error,
+      `Failed to update transaction with ID: ${id}`,
+      dataToUpdate
+    )
+  }
 }
