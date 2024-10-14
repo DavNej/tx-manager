@@ -1,8 +1,14 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
+import { createTransactionSchema } from '@/drizzle/schema'
+import { toast } from '@/hooks/use-toast'
+import { createTransaction } from '@/server/actions'
+import { handleUnexpectedError, isZodError } from '@/server/error-service'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
-import { Calendar as CalendarIcon, Sparkles, Send } from 'lucide-react'
+import { Calendar as CalendarIcon, Send, Sparkles } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { cn, generateRandomEvmAddress } from '@/lib/utils'
@@ -50,6 +56,8 @@ type Body = {
 }
 
 export default function TransactionForm() {
+  const router = useRouter()
+  const queryClient = useQueryClient()
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -62,7 +70,7 @@ export default function TransactionForm() {
     },
   })
 
-  function onSubmit(values: FormValues) {
+  async function onSubmit(values: FormValues) {
     const body: Body = {
       amount: values.amount,
       senderWallet: values.senderWallet,
@@ -76,7 +84,23 @@ export default function TransactionForm() {
       body.scheduledFor = scheduledFor
     }
 
-    console.log(body)
+    try {
+      const transactionArgs = createTransactionSchema.parse(body)
+      await createTransaction(transactionArgs)
+      toast({
+        title: 'Success',
+        description: 'New transaction created successfully',
+        variant: 'success',
+      })
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      router.push('/')
+    } catch (error) {
+      handleUnexpectedError(error)
+      const description = isZodError(error)
+        ? 'Wrong transaction data format'
+        : 'Something went wrong'
+      toast({ title: 'Oops!', description, variant: 'destructive' })
+    }
   }
 
   return (
@@ -244,9 +268,19 @@ export default function TransactionForm() {
           </>
         )}
 
-        <Button className="ml-auto" type="submit">
-          Send
-          <Send className="ml-2 size-4" />
+        <Button
+          className="ml-auto"
+          type="submit"
+          disabled={form.formState.isSubmitting}
+        >
+          {form.formState.isSubmitting ? (
+            <>Sending ...</>
+          ) : (
+            <>
+              Send
+              <Send className="ml-2 size-4" />
+            </>
+          )}
         </Button>
       </form>
     </Form>
