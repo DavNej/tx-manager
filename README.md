@@ -41,7 +41,7 @@ docker-compose up -d
 
 ### Lancement du worker
 
-Pour la programmation de transactions, nous devons lancer dans un terminal le worker. Pour ce faire:
+Pour la programmation de transactions, nous devons lancer le worker dans un terminal avec la commande suivante:
 
 ```bash
 pnpm worker:run
@@ -49,7 +49,7 @@ pnpm worker:run
 
 ### Lancement de l'Application
 
-Générer un build optimisé pour la production puis lancez l'app en executant les commandes suivantes
+Dans un autre terminal, nous générerons un build optimisé pour la production puis lançons l'app en executant les commandes suivantes:
 
 ```bash
 pnpm build
@@ -67,3 +67,4 @@ pnpm start
 * **Tanstack Query** : gestion des requêtes asynchrones et du cache côté client
 * **Sentry** : error tracking tool
 * **Playwright** : End to end testing
+* **Jest** : Unit testing framework testing
