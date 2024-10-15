@@ -1,66 +1,69 @@
-# Transaction manager
+# Tx Manager
 
-## Instructions
+Tx Manager est un module de transactions permettant de créer et de programmer des transactions développé avec Next.js tant pour l'interface utilisateur que pour les API Routes.
 
-Develop a transaction management module that simulate transaction process
+Garder la logique au sein d'une même app permet une meilleure integration du frontend avec le backend. Le framework permet également d'exposer l'api à d'éventuels autres services qui voudraient l'exploiter. Nous simlpifions ainsi la structure du projet en centralisant la logique de routage, les types TypeScript, la validation des données et certaines autres fonctionnalités au sein d'une même codebase.
 
-## Responsibilities
+## Installation
 
-- Manage payments
-- Trigger transactions
-- Validate transactions
-- Schedule transactions
-- Errors handling
+Avant de commencer, assurez-vous d'avoir les outils suivants installés sur votre machine :
 
-## Objectives
+* Docker & Docker Compose
+* Node.js (v20 ou plus récent)
+* pnpm : pour la gestion des paquets.
 
-### 1. Backend (Nest.js or Node.js / PostgreSQL) => REST API
+### Cloner le repo
 
-- Creation of transactions (`amount` from `sender` to `receiver`)
-- Schedule future transactions.
-- Transaction status management (`pending`, `scheduled`, `completed`, `failed`)
-- Implementation (or at least design on paper) of a error handling mechanism (from code or API) (see 3.)
-- Data persistence with PostgreSQL
+```bash
+git clone git@github.com:DavNej/tx-manager.git
+cd tx-manager
+```
 
-NB: A transaction is actually carried out by calling an external API (typically that of a payment service provider. A payment service provider who “hosts” users' wallets). You can therefore call an imaginary function coded beforehand and requesting this API.
+### Installer les dépendances
 
-### 2. Frontend (Next.js)
+Utilisez `pnpm` pour installer les dépendances du projet
 
-- Create manual and scheduled transactions
-- View transaction history and status
-- Manage transaction errors and retry transactions manually
+```bash
+pnpm install
+```
 
-### 3. Error management and resilience
+### Configurer les Variables d'Environnement
 
-- Implement error management
-- Manage scenarios where a transaction fails
+Créez un fichier `.env` à la racine du projet et configurez les variables nécessaires en accord avec le fichier `.env.example` . Adaptez les informations selon votre configuration.
 
-### 4. Autonomy and proactivity
+### Lancer les services
 
-- Make choices in terms of architecture, code organization and good development practices.
-- Suggest improvements or additional features related to transaction resilience or user experience will be a plus.
+L'application utilise une base de données Postgres et un service Redis pour la gestion des tâches planifiées (scheduling) avec BullMQ. Pour démarrer ces services, utilisez la commande suivante :
 
-## Technical details
+```bash
+docker-compose up -d
+```
 
-Tests (recommended):
+### Lancement du worker
 
-- Write at least part of the tests that would validate the main features. In addition, don't hesitate to think about how to test the third-party transaction API (to test both its integration with the code and the API itself. Identify any regressions).
+Pour la programmation de transactions, nous devons lancer dans un terminal le worker. Pour ce faire:
 
-Bonus:
+```bash
+pnpm worker:run
+```
 
-- Add a notification system to inform the user in real time of the status of his or her transactions (e.g. WebSockets).
-- Design a scalable architecture for the transactional service, which you will present orally.
+### Lancement de l'Application
 
-## Evaluation criteria
+Générer un build optimisé pour la production puis lancez l'app en executant les commandes suivantes
 
-- Code quality: Cleanliness, organization and readability of the code.
-- Error handling: Robustness of the system in the event of breakdowns or transaction failures.
-- Autonomy and proactivity: Ability to make technical choices, anticipate problems and propose solutions.
-- User experience: Fluidity and simplicity of the user interface.
-- Testing: Presence and quality of tests.
+```bash
+pnpm build
+pnpm start
+```
 
-## Deliverables
+## Technologies et Librairies
 
-- Project source code (via GitHub or other repository).
-- A (very) brief documentation of how the system works, explaining technical choices.
-- Optional: a short report on any areas of improvement you've identified for transaction management (linked to point 3 of the “Bonus” section)
+* **Next.js** : framework principal pour l'interface et l'API
+* **Drizzle** : ORM et gestion de la base de données Postgres
+* **Zod** : validation des données
+* **BullMQ** : la gestion des transactions programmées
+* **Server Actions** : gestion côté serveur plus performante
+* **React Hook Form** : gestion des formulaires avec validation
+* **Tanstack Query** : gestion des requêtes asynchrones et du cache côté client
+* **Sentry** : error tracking tool
+* **Playwright** : End to end testing
