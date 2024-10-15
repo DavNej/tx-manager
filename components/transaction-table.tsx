@@ -2,7 +2,12 @@
 
 import React from 'react'
 import type { SelectTransaction } from '@/drizzle/schema'
+import { toast } from '@/hooks/use-toast'
+import { handleUnexpectedError } from '@/server/error-service'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { RefreshCw } from 'lucide-react'
+import api from '@/lib/api'
+import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -24,11 +29,9 @@ function formatDate(date: Date | null): string {
     hour: 'numeric',
     minute: 'numeric',
     hour12: false,
-  }).format(new Date(date))
-}
-
-function handleRetry(id: string) {
-  console.log(`Retrying transaction ${id}`)
+  })
+    .format(new Date(date))
+    .replace('24:', '00:')
 }
 
 export function TransactionTableHeader() {
@@ -63,6 +66,44 @@ export default function TransactionTable({
 }: {
   data: SelectTransaction[]
 }) {
+  const [mutatingTransactionId, setMutatingTransactionId] = React.useState('')
+  const queryClient = useQueryClient()
+  const mutation = useMutation({
+    mutationKey: ['retry-transaction'],
+    mutationFn: (id: string) =>
+      api.PUT<SelectTransaction>(`/api/transactions/${id}/retry`),
+    onMutate(id) {
+      setMutatingTransactionId(id)
+    },
+    onError(error) {
+      handleUnexpectedError(error)
+      toast({
+        title: 'Oops!',
+        description: 'Something went wrong',
+        variant: 'destructive',
+      })
+    },
+    onSuccess(data) {
+      if (data.status === 'completed') {
+        toast({
+          title: 'Success',
+          description: 'Transaction completed successfully',
+          variant: 'success',
+        })
+      } else {
+        toast({
+          title: 'Transaction failed',
+          description: 'Transaction reprocessed but failed again',
+          variant: 'default',
+        })
+      }
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+    },
+    onSettled() {
+      setMutatingTransactionId('')
+    },
+  })
+
   return (
     <Table>
       <TransactionTableHeader />
@@ -92,10 +133,18 @@ export default function TransactionTable({
                   <Button
                     size="icon"
                     variant="ghost"
-                    onClick={() => handleRetry(tx.id)}
+                    disabled={mutation.isPending}
+                    onClick={() => mutation.mutate(tx.id)}
                     title="Retry"
                   >
-                    <RefreshCw className="size-4" />
+                    <RefreshCw
+                      className={cn(
+                        'size-4',
+                        mutation.isPending &&
+                          mutatingTransactionId === tx.id &&
+                          'animate-spin'
+                      )}
+                    />
                   </Button>
                 )}
               </TableCell>
