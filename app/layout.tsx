@@ -4,7 +4,7 @@ import { Toaster } from '@/components/ui/toaster'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'TX manager',
+  title: 'Tx Manager',
   description:
     'A transaction management module that simulate transaction process',
 }

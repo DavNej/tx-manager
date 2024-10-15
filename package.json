@@ -13,7 +13,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:drop": "drizzle-kit drop",
     "db:studio": "drizzle-kit studio",
-    "worker:run": "tsx --watch server/worker.ts"
+    "worker:run": "tsx --watch server/worker.ts",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -48,6 +49,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.48.0",
     "@tanstack/eslint-plugin-query": "^5.59.1",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/node": "^20",
