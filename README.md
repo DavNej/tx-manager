@@ -56,6 +56,10 @@ pnpm build
 pnpm start
 ```
 
+### Population de la base de données
+
+Effectuer une requête `POST` sur le endpoint `/transactions/seed` afin d'insérer de nouvelles transactions dans la base de données. Le body de la requête est de la forme `{ count : '<tx_count>' }`
+
 ## Technologies et Librairies
 
 * **Next.js** : framework principal pour l'interface et l'API
