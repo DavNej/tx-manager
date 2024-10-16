@@ -5,8 +5,8 @@ import dotenv from 'dotenv'
 import { and, eq, lte, notInArray } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
-import { processTransaction } from './actions'
-import { handleWorkerError } from './error-service'
+import { handleDatabaseError, handleWorkerError } from './error-service'
+import { sendToPaymentProvider } from './payment-provider'
 import {
   connection,
   scheduleTransaction,
@@ -29,8 +29,6 @@ const worker = new Worker(
   async (job: Job) => {
     const { transactionId } = job.data
 
-    console.log('🦋 Job running', job.data)
-
     try {
       const transaction = await db.query.transactionsTable.findFirst({
         where: (transactionsTable, { eq }) =>
@@ -38,11 +36,26 @@ const worker = new Worker(
       })
 
       if (transaction) {
-        const processedTransaction = await processTransaction(transaction)
-        return processedTransaction.status
+        const isTransactionSuccess = await sendToPaymentProvider()
+        const newStatus = isTransactionSuccess ? 'completed' : 'failed'
+
+        try {
+          const [updatedTransaction] = await db
+            .update(transactionsTable)
+            .set({ status: newStatus, updatedAt: new Date() })
+            .where(eq(transactionsTable.id, transaction.id))
+            .returning()
+          return updatedTransaction.status
+        } catch (error) {
+          throw handleDatabaseError(
+            error,
+            `Failed to update transaction with ID: ${transaction.id}`,
+            { status: newStatus, updatedAt: new Date() }
+          )
+        }
       }
     } catch (error) {
-      handleWorkerError(error)
+      throw handleWorkerError(error)
     }
   },
   { connection }
@@ -54,7 +67,8 @@ worker.on('ready', () => {
 })
 
 worker.on('active', (job) => {
-  console.log('⚙️  Starting job ', job.id)
+  console.log('\n-------------\n')
+  console.log(`⚙️  Starting job ${job.id} : `, job.data)
 })
 
 worker.on('completed', (job) => {

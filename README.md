@@ -8,9 +8,9 @@ Garder la logique au sein d'une même app permet une meilleure integration du fr
 
 Avant de commencer, assurez-vous d'avoir les outils suivants installés sur votre machine :
 
-* Docker & Docker Compose
-* Node.js (v20 ou plus récent)
-* pnpm : pour la gestion des paquets.
+- Docker & Docker Compose
+- Node.js (v20 ou plus récent)
+- pnpm : pour la gestion des paquets.
 
 ### Cloner le repo
 
@@ -62,13 +62,13 @@ Effectuer une requête `POST` sur le endpoint `/transactions/seed` afin d'insér
 
 ## Technologies et Librairies
 
-* **Next.js** : framework principal pour l'interface et l'API
-* **Drizzle** : ORM et gestion de la base de données Postgres
-* **Zod** : validation des données
-* **BullMQ** : la gestion des transactions programmées
-* **Server Actions** : gestion côté serveur plus performante
-* **React Hook Form** : gestion des formulaires avec validation
-* **Tanstack Query** : gestion des requêtes asynchrones et du cache côté client
-* **Sentry** : error tracking tool
-* **Playwright** : End to end testing
-* **Jest** : Unit testing framework testing
+- **Next.js** : framework principal pour l'interface et l'API
+- **Drizzle** : ORM et gestion de la base de données Postgres
+- **Zod** : validation des données
+- **BullMQ** : la gestion des transactions programmées
+- **Server Actions** : gestion côté serveur plus performante
+- **React Hook Form** : gestion des formulaires avec validation
+- **Tanstack Query** : gestion des requêtes asynchrones et du cache côté client
+- **Sentry** : error tracking tool
+- **Playwright** : End to end testing
+- **Jest** : Unit testing framework testing
