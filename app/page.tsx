@@ -7,6 +7,8 @@ import Header from '@/components/header'
 import TransactionList from '@/components/transaction-list'
 import { Card, CardContent } from '@/components/ui/card'
 
+export const dynamic = 'force-dynamic'
+
 export default async function Home() {
   const queryClient = getQueryClient()
   void queryClient.prefetchQuery(getTransactionsOptions())

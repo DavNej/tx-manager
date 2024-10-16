@@ -9,8 +9,6 @@ import {
 } from '@/server/error-service'
 import { z } from 'zod'
 
-export const dynamic = 'force-dynamic'
-
 export async function POST(request: NextRequest) {
   const body = await request.json()
 
