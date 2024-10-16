@@ -3,7 +3,7 @@
 import { insertTransaction, updateTransactionById } from '@/drizzle/query'
 import type { CreateTransaction, SelectTransaction } from '@/drizzle/schema'
 import { sendToPaymentProvider } from '@/server/payment-provider'
-import { scheduleTransaction } from '@/server/transaction-queue'
+import { scheduleTransaction } from '@/scheduler/transaction-queue'
 
 export async function createTransaction(args: CreateTransaction) {
   const { scheduledFor } = args

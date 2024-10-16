@@ -1,18 +1,9 @@
 import { Queue } from 'bullmq'
-import dotenv from 'dotenv'
-import IORedis from 'ioredis'
+import { redis } from './init'
 
-dotenv.config()
-
-const redisUrl = process.env.REDIS_URL
-
-if (!redisUrl) {
-  throw new Error('REDIS_URL is not set')
-}
-
-export const connection = new IORedis(redisUrl, { maxRetriesPerRequest: null })
-
-export const transactionQueue = new Queue('transactionQueue', { connection })
+export const transactionQueue = new Queue('transactionQueue', {
+  connection: redis,
+})
 
 export async function scheduleTransaction({
   transactionId,

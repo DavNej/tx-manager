@@ -1,28 +1,10 @@
-import * as schema from '@/drizzle/schema'
-import { transactionsTable } from '@/drizzle/schema'
 import { type Job, Worker } from 'bullmq'
-import dotenv from 'dotenv'
 import { and, eq, lte, notInArray } from 'drizzle-orm'
-import { drizzle } from 'drizzle-orm/postgres-js'
-import postgres from 'postgres'
-import { handleDatabaseError, handleWorkerError } from './error-service'
-import { sendToPaymentProvider } from './payment-provider'
-import {
-  connection,
-  scheduleTransaction,
-  transactionQueue,
-} from './transaction-queue'
-
-dotenv.config()
-
-const databaseUrl = process.env.DATABASE_URL as string
-
-if (!databaseUrl) {
-  throw new Error('DATABASE_URL is not set')
-}
-
-const sql = postgres(databaseUrl, { max: 1 })
-const db = drizzle(sql, { schema, logger: true })
+import { transactionsTable } from '@/drizzle/schema'
+import { handleDatabaseError, handleWorkerError } from '@/server/error-service'
+import { sendToPaymentProvider } from '@/server/payment-provider'
+import { db, redis } from './init'
+import { scheduleTransaction, transactionQueue } from './transaction-queue'
 
 const worker = new Worker(
   'transactionQueue',
@@ -58,7 +40,7 @@ const worker = new Worker(
       throw handleWorkerError(error)
     }
   },
-  { connection }
+  { connection: redis }
 )
 
 worker.on('ready', () => {

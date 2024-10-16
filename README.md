@@ -8,9 +8,9 @@ Garder la logique au sein d'une même app permet une meilleure integration du fr
 
 Avant de commencer, assurez-vous d'avoir les outils suivants installés sur votre machine :
 
-- Docker & Docker Compose
-- Node.js (v20 ou plus récent)
-- pnpm : pour la gestion des paquets.
+* Docker & Docker Compose
+* Node.js (v20 ou plus récent)
+* pnpm : pour la gestion des paquets.
 
 ### Cloner le repo
 
@@ -31,30 +31,23 @@ pnpm install
 
 Créez un fichier `.env` à la racine du projet et configurez les variables nécessaires en accord avec le fichier `.env.example` . Adaptez les informations selon votre configuration.
 
-### Lancer les services
+### Lancement de l'Application et de ses services
 
-L'application utilise une base de données Postgres et un service Redis pour la gestion des tâches planifiées (scheduling) avec BullMQ. Pour démarrer ces services, utilisez la commande suivante :
+L'application utilise plusieurs services à savoir:
 
-```bash
-docker-compose up -d
-```
+* Une base de données Postgres (persistance des donnéees)
+* Un scheduler (pour la gestion des tâches planifiées avec BullMQ)
+* Un Redis (utilisé par le scheduler)
 
-### Lancement du worker
-
-Pour la programmation de transactions, nous devons lancer le worker dans un terminal avec la commande suivante:
+Afin de tous les démarrer, utilisez la commande suivante :
 
 ```bash
-pnpm worker:run
+docker compose up -d
 ```
 
-### Lancement de l'Application
+Cela peut prendre quelques minutes
 
-Dans un autre terminal, nous générerons un build optimisé pour la production puis lançons l'app en executant les commandes suivantes:
-
-```bash
-pnpm build
-pnpm start
-```
+Vous pouvez désormais visiter l'url [http://localhost:3000](http://localhost:3000)
 
 ### Population de la base de données
 
@@ -62,13 +55,13 @@ Effectuer une requête `POST` sur le endpoint `/transactions/seed` afin d'insér
 
 ## Technologies et Librairies
 
-- **Next.js** : framework principal pour l'interface et l'API
-- **Drizzle** : ORM et gestion de la base de données Postgres
-- **Zod** : validation des données
-- **BullMQ** : la gestion des transactions programmées
-- **Server Actions** : gestion côté serveur plus performante
-- **React Hook Form** : gestion des formulaires avec validation
-- **Tanstack Query** : gestion des requêtes asynchrones et du cache côté client
-- **Sentry** : error tracking tool
-- **Playwright** : End to end testing
-- **Jest** : Unit testing framework testing
+* **Next.js** : framework principal pour l'interface et l'API
+* **Drizzle** : ORM et gestion de la base de données Postgres
+* **Zod** : validation des données
+* **BullMQ** : la gestion des transactions programmées
+* **Server Actions** : gestion côté serveur plus performante
+* **React Hook Form** : gestion des formulaires avec validation
+* **Tanstack Query** : gestion des requêtes asynchrones et du cache côté client
+* **Sentry** : error tracking tool
+* **Playwright** : End to end testing
+* **Jest** : Unit testing framework testing

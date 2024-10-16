@@ -18,3 +18,34 @@ services:
     container_name: tx_manager_redis
     ports:
       - 6379:6379
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.scheduler
+    image: scheduler # Name the image
+    container_name: tx_manager_scheduler
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgres://root:password@postgres:5432/main
+    depends_on:
+      - postgres
+      - redis
+    restart: always
+
+  app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.app
+    image: tx_manager # Name the image
+    container_name: tx_manager_app
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgres://root:password@postgres:5432/main
+    depends_on:
+      - postgres
+      - redis
+      - scheduler
+    ports:
+      - 3000:3000
+    restart: always

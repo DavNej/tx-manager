@@ -1,0 +1,16 @@
+FROM node:20-alpine
+
+RUN npm install -g pnpm
+
+WORKDIR /app
+
+# Copy the application code
+COPY ./scheduler ./
+COPY ./server ./server
+COPY ./drizzle/schema.ts ./drizzle/
+COPY ./tsconfig.json ./
+
+# Install dependencies
+RUN pnpm install
+
+CMD ["pnpm", "start"]
