@@ -1,24 +1,25 @@
-FROM node:20-alpine AS builder
+FROM node:20-alpine AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
 WORKDIR /app
-
-COPY package.json pnpm-lock.yaml* ./
-RUN npm install -g pnpm && pnpm install && pnpm add @sentry/utils
 
 COPY . .
-RUN pnpm build
 
-FROM node:18-alpine AS runner
+FROM base AS prod-deps
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
-WORKDIR /app
+FROM base AS build
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm run build
 
-RUN npm install -g pnpm
-
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/package.json ./package.json
+FROM base
+COPY --from=prod-deps /app/node_modules /app/node_modules
+COPY --from=build /app/.next /app/.next
+COPY --from=build /app/public /app/public
+COPY --from=build /app/package.json /app/package.json
 
 EXPOSE 3000
 
-CMD ["pnpm", "start"]
+CMD [ "pnpm", "start" ]

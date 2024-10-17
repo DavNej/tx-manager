@@ -53,6 +53,10 @@ Vous pouvez désormais visiter l'url [http://localhost:3000](http://localhost:30
 
 Effectuer une requête `POST` sur le endpoint `/transactions/seed` afin d'insérer de nouvelles transactions dans la base de données. Le body de la requête est de la forme `{ count : '<tx_count>' }`
 
+```bash
+curl -X POST http://localhost:3000/api/transactions/seed -H "Content-Type: application/json" -d '{"count":30}'
+```
+
 ## Technologies et Librairies
 
 * **Next.js** : framework principal pour l'interface et l'API

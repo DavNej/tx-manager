@@ -14,6 +14,7 @@ async function GET<T>(url: string): Promise<T> {
   const response = await fetch(new URL(url, baseUrl), {
     method: 'GET',
     headers,
+    cache: 'no-store',
   })
 
   let responseBody: T

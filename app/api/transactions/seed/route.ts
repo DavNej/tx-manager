@@ -12,7 +12,9 @@ export async function POST(request: NextRequest) {
       insertedId: transactionsTable.id,
     })
 
-    return NextResponse.json({ insertedTxIds }, { status: 200 })
+    const txIds = insertedTxIds.map((row) => row.insertedId)
+
+    return NextResponse.json(txIds, { status: 200 })
   } catch (error) {
     handleUnexpectedError(error)
     return NextResponse.json(
