@@ -6,25 +6,13 @@ Garder la logique au sein d'une même app permet une meilleure integration du fr
 
 ## Installation
 
-Avant de commencer, assurez-vous d'avoir les outils suivants installés sur votre machine :
-
-* Docker & Docker Compose
-* Node.js (v20 ou plus récent)
-* pnpm : pour la gestion des paquets.
+Avant de commencer, assurez-vous d'avoir Docker & Docker Compose installés sur votre machine
 
 ### Cloner le repo
 
 ```bash
 git clone git@github.com:DavNej/tx-manager.git
 cd tx-manager
-```
-
-### Installer les dépendances
-
-Utilisez `pnpm` pour installer les dépendances du projet
-
-```bash
-pnpm install
 ```
 
 ### Configurer les Variables d'Environnement
